@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class MainController {
+public class MainController extends Controller {
 
     @FXML
     private TableView<Film> filmTable;
@@ -31,6 +31,8 @@ public class MainController {
     @FXML
     private TableColumn<Film, Integer> colErtekeles;
 
+    private FilmDb db;
+
     public void initialize(){
         colCim.setCellValueFactory(new PropertyValueFactory<>("cim"));
         //a tárolt objektumban egy getCim függvényt fog keresni.
@@ -38,9 +40,9 @@ public class MainController {
         colHossz.setCellValueFactory(new PropertyValueFactory<>("hossz"));
         colErtekeles.setCellValueFactory(new PropertyValueFactory<>("ertekeles"));
         try {
-            FilmDb db = new FilmDb();
+            db = new FilmDb();
             List<Film> filmList = db.getFilmek();
-            for(Film film: filmList){
+            for(Film film: filmList) {
                 filmTable.getItems().add(film);
             }
         } catch (SQLException e) {
@@ -48,19 +50,6 @@ public class MainController {
         }
     }
 
-    private void hibaKiir(Exception e) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Hiba");
-        alert.setHeaderText(e.getClass().toString());
-        alert.setContentText(e.getMessage());
-        Timer alertTimer = new Timer();
-        alertTimer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                Platform.runLater(() -> alert.show());
-            }
-        }, 500);
-    }
 
     @FXML
     public void onModositasButtonClick(ActionEvent actionEvent) {
@@ -68,6 +57,22 @@ public class MainController {
 
     @FXML
     public void onTorlesButtonClick(ActionEvent actionEvent) {
+        int selectedIndex = filmTable.getSelectionModel().getSelectedIndex();
+        if (selectedIndex == -1) {
+            alert("A törléshez előbb válasszon ki egy elemet a táblázatból");
+            return;
+        }
+        Film torlendoFilm = filmTable.getSelectionModel().getSelectedItem();
+        if (!confirm("Biztos hogy törölni szeretné az alábbi filmet: " + torlendoFilm.getCim())) {
+            return;
+        }
+        try {
+            db.filmTorles(torlendoFilm.getId());
+            alert("Sikeres törlés");
+            filmListaFeltolt();
+        } catch (SQLException e) {
+            hibaKiir(e);
+        }
     }
 
     @FXML
@@ -78,8 +83,21 @@ public class MainController {
             Scene scene = new Scene(fxmlLoader.load(), 320, 400);
             stage.setTitle("FilmDb");
             stage.setScene(scene);
+            stage.setOnCloseRequest(event -> filmListaFeltolt());
             stage.show();
         } catch (Exception e) {
+            hibaKiir(e);
+        }
+    }
+
+    private void filmListaFeltolt() {
+        try {
+            List<Film> filmList = db.getFilmek();
+            filmTable.getItems().clear();
+            for(Film film: filmList){
+                filmTable.getItems().add(film);
+            }
+        } catch (SQLException e) {
             hibaKiir(e);
         }
     }

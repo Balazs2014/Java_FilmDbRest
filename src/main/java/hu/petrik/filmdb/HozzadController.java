@@ -4,6 +4,8 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 
+import java.sql.SQLException;
+
 public class HozzadController {
     @FXML
     private TextField inputCim;
@@ -48,6 +50,17 @@ public class HozzadController {
         }
         System.out.println(hossz);
         int ertekeles = inputErtekeles.getValue();
+        try {
+            FilmDb db = new FilmDb();
+            boolean siker = db.filmHozzaadasa(cim, kategoria, hossz, ertekeles);
+            if (siker) {
+                alert("Film hozzáadása sikeres");
+            } else {
+                alert("Film hozzáadása Sikertelen");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     private void alert(String uzenet) {

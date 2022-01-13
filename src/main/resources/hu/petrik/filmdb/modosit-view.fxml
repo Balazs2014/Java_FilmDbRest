@@ -1,14 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
+<?import javafx.collections.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="hu.petrik.filmdb.ModositView"
-            prefHeight="400.0" prefWidth="600.0">
-
-</AnchorPane>
+<GridPane hgap="10.0" vgap="10.0" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1"
+          fx:controller="hu.petrik.filmdb.controllers.ModositController">
+    <columnConstraints>
+        <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+        <ColumnConstraints hgrow="SOMETIMES" minWidth="100.0" prefWidth="200.0"/>
+    </columnConstraints>
+    <rowConstraints>
+        <RowConstraints minHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+        <RowConstraints minHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+        <RowConstraints minHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+        <RowConstraints minHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+        <RowConstraints minHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+    </rowConstraints>
+    <children>
+        <TextField fx:id="inputCim" promptText="Cim" GridPane.columnIndex="1"/>
+        <Label text="Cím"/>
+        <Label text="Kategória" GridPane.rowIndex="1"/>
+        <Label text="Hossz (perc)" GridPane.rowIndex="2"/>
+        <Label text="Értékelés" GridPane.rowIndex="3"/>
+        <TextField fx:id="inputKategoria" promptText="Kategória" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+        <Spinner fx:id="inputHossz" editable="true" minWidth="100.0" prefWidth="200.0" GridPane.columnIndex="1"
+                 GridPane.hgrow="ALWAYS" GridPane.rowIndex="2">
+            <valueFactory>
+                <SpinnerValueFactory.IntegerSpinnerValueFactory amountToStepBy="10" initialValue="100" max="999"
+                                                                min="1"/>
+            </valueFactory>
+        </Spinner>
+        <ChoiceBox fx:id="inputErtekeles" minWidth="100.0" prefWidth="200.0" value="5" GridPane.columnIndex="1"
+                   GridPane.hgrow="ALWAYS" GridPane.rowIndex="3">
+            <items>
+                <FXCollections fx:factory="observableArrayList">
+                    <Integer fx:value="1"/>
+                    <Integer fx:value="2"/>
+                    <Integer fx:value="3"/>
+                    <Integer fx:value="4"/>
+                    <Integer fx:value="5"/>
+                    <Integer fx:value="6"/>
+                    <Integer fx:value="7"/>
+                    <Integer fx:value="8"/>
+                    <Integer fx:value="9"/>
+                    <Integer fx:value="10"/>
+                </FXCollections>
+            </items>
+        </ChoiceBox>
+        <Button minWidth="100.0" mnemonicParsing="false" onAction="#onModositButtonClick" prefWidth="200.0"
+                text="Módosítás" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="4"/>
+    </children>
+</GridPane>

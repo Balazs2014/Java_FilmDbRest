@@ -1,11 +1,15 @@
 package hu.petrik.filmdb.controllers;
 
 import hu.petrik.filmdb.Controller;
+import hu.petrik.filmdb.Film;
+import hu.petrik.filmdb.FilmDb;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.TextField;
+
+import java.sql.SQLException;
 
 public class ModositController extends Controller {
 
@@ -17,6 +21,23 @@ public class ModositController extends Controller {
     private Spinner<Integer> inputHossz;
     @FXML
     private ChoiceBox<Integer> inputErtekeles;
+    private Film modositando;
+
+    public Film getModositando() {
+        return modositando;
+    }
+
+    public void setModositando(Film modositando) {
+        this.modositando = modositando;
+        ertekekeBeallitasa();
+    }
+
+    private void ertekekeBeallitasa() {
+        inputCim.setText(modositando.getCim());
+        inputKategoria.setText(modositando.getKategoria());
+        inputHossz.getValueFactory().setValue(modositando.getHossz());
+        inputErtekeles.setValue(modositando.getErtekeles());
+    }
 
     @FXML
     public void onModositButtonClick(ActionEvent actionEvent) {
@@ -51,5 +72,22 @@ public class ModositController extends Controller {
         }
 
         int ertekeles = inputErtekeles.getValue();
+
+        modositando.setCim(cim);
+        modositando.setKategoria(kategoria);
+        modositando.setHossz(hossz);
+        modositando.setErtekeles(ertekeles);
+
+        try {
+            FilmDb db = new FilmDb();
+            if (db.filmModositasa(modositando)) {
+                alertWait("Sikeres módosítás");
+                this.stage.close();
+            } else {
+                alert("Sikertelen módosítás");
+            }
+        } catch (SQLException e) {
+            hibaKiir(e);
+        }
     }
 }

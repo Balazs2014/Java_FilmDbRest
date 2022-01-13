@@ -37,7 +37,7 @@ public class MainController extends Controller {
 
     private FilmDb db;
 
-    public void initialize(){
+    public void initialize() {
         colCim.setCellValueFactory(new PropertyValueFactory<>("cim"));
         //a tárolt objektumban egy getCim függvényt fog keresni.
         colKategoria.setCellValueFactory(new PropertyValueFactory<>("kategoria"));
@@ -46,7 +46,7 @@ public class MainController extends Controller {
         try {
             db = new FilmDb();
             List<Film> filmList = db.getFilmek();
-            for(Film film: filmList) {
+            for (Film film : filmList) {
                 filmTable.getItems().add(film);
             }
         } catch (SQLException e) {
@@ -57,6 +57,20 @@ public class MainController extends Controller {
 
     @FXML
     public void onModositasButtonClick(ActionEvent actionEvent) {
+        int selectedIndex = filmTable.getSelectionModel().getSelectedIndex();
+        if (selectedIndex == -1) {
+            alert("A módosításhoz előbb válasszon ki egy elemet a táblázatból");
+            return;
+        }
+        Film modositando = filmTable.getSelectionModel().getSelectedItem();
+        try {
+            ModositController modositas = (ModositController) ujAblak("modosit-view.fxml", "Film módosítása", 320, 400);
+            modositas.setModositando(modositando);
+            modositas.getStage().setOnHiding(event -> filmTable.refresh());
+            modositas.getStage().show();
+        } catch (IOException e) {
+            hibaKiir(e);
+        }
     }
 
     @FXML
@@ -82,13 +96,9 @@ public class MainController extends Controller {
     @FXML
     public void onHozzadasButtonClick(ActionEvent actionEvent) {
         try {
-            Stage stage = new Stage();
-            FXMLLoader fxmlLoader = new FXMLLoader(FilmApp.class.getResource("hozzaad-view.fxml"));
-            Scene scene = new Scene(fxmlLoader.load(), 320, 400);
-            stage.setTitle("FilmDb");
-            stage.setScene(scene);
-            stage.setOnCloseRequest(event -> filmListaFeltolt());
-            stage.show();
+            Controller hozzadas = ujAblak("hozzaad-view.fxml", "Film hozzáadása", 320, 400);
+            hozzadas.getStage().setOnCloseRequest(event -> filmListaFeltolt());
+            hozzadas.getStage().show();
         } catch (Exception e) {
             hibaKiir(e);
         }
@@ -98,7 +108,7 @@ public class MainController extends Controller {
         try {
             List<Film> filmList = db.getFilmek();
             filmTable.getItems().clear();
-            for(Film film: filmList){
+            for (Film film : filmList) {
                 filmTable.getItems().add(film);
             }
         } catch (SQLException e) {

@@ -1,9 +1,8 @@
 package hu.petrik.filmdb.controllers;
 
-import hu.petrik.filmdb.Controller;
-import hu.petrik.filmdb.Film;
-import hu.petrik.filmdb.FilmApp;
-import hu.petrik.filmdb.FilmDb;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import hu.petrik.filmdb.*;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -17,6 +16,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Timer;
@@ -43,15 +43,7 @@ public class MainController extends Controller {
         colKategoria.setCellValueFactory(new PropertyValueFactory<>("kategoria"));
         colHossz.setCellValueFactory(new PropertyValueFactory<>("hossz"));
         colErtekeles.setCellValueFactory(new PropertyValueFactory<>("ertekeles"));
-        try {
-            db = new FilmDb();
-            List<Film> filmList = db.getFilmek();
-            for (Film film : filmList) {
-                filmTable.getItems().add(film);
-            }
-        } catch (SQLException e) {
-            hibaKiir(e);
-        }
+        filmListaFeltolt();
     }
 
 
@@ -106,12 +98,21 @@ public class MainController extends Controller {
 
     private void filmListaFeltolt() {
         try {
-            List<Film> filmList = db.getFilmek();
+            Response response = RequestHandler.get("http://localhost/film_db_rest/api/film");
+            String json = response.getContent();
+            if (response.getResponseCode() >= 400) {
+                System.out.println(json);
+                return;
+            }
+
+            Gson jsonConverter = new Gson();
+            Type type = new TypeToken<List<Film>>(){}.getType();
+            List<Film> filmList = jsonConverter.fromJson(json, type);
             filmTable.getItems().clear();
             for (Film film : filmList) {
                 filmTable.getItems().add(film);
             }
-        } catch (SQLException e) {
+        } catch (IOException e) {
             hibaKiir(e);
         }
     }
